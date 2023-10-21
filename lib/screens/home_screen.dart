@@ -1,4 +1,3 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:apimh/widgets/widgets.dart';
@@ -14,12 +13,12 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        actions: [
+/*         actions: [
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.search_outlined),
           )
-        ],
+        ], */
         title: const Center(
           child: Text('MONSTERS'),
         ),

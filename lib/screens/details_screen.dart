@@ -1,6 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:apimh/models/models.dart';
 
+class DetailsScreen extends StatefulWidget {
+  const DetailsScreen({super.key});
+
+  @override
+  State<DetailsScreen> createState() => _DetailsScreenState();
+}
+
+class _DetailsScreenState extends State<DetailsScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final Monster monster =
+        ModalRoute.of(context)?.settings.arguments as Monster;
+    return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.orange, title: Text(monster.name)),
+      body: CustomScrollView(
+        slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate.fixed(
+                [TitleAuthorImage(monster: monster)]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TitleAuthorImage extends StatelessWidget {
+  const TitleAuthorImage({super.key, required this.monster});
+  final Monster monster;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          alignment: Alignment.topLeft,
+          child: Text(
+            monster.name,
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.left,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          alignment: Alignment.topLeft,
+          child: Text(
+            monster.description,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            textAlign: TextAlign.left,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          child: FadeInImage(
+            fit: BoxFit.fitHeight,
+            placeholder: const AssetImage('assets/imgs/loading.gif'),
+            imageErrorBuilder: (context, error, stackTrace) {
+              return Image.asset(
+                'assets/imgs/nodata.png',
+              );
+            },
+            image: AssetImage('assets/imgs/monsters/${monster.name}.jpg'),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          alignment: Alignment.topLeft,
+          child: Text(
+            monster.species,
+            style: const TextStyle(fontSize: 18),
+            textAlign: TextAlign.left,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/* 
 class DetailsScreen extends StatelessWidget {
   const DetailsScreen({super.key});
 
@@ -135,3 +215,4 @@ class _Overview extends StatelessWidget {
     );
   }
 }
+ */

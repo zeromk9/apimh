@@ -16,7 +16,7 @@ class CardSwiper extends StatelessWidget {
         itemCount: monsters.length,
         layout: SwiperLayout.STACK,
         itemWidth: size.width * 0.6,
-        itemHeight: size.height * 0.4,
+        itemHeight: size.height,
         itemBuilder: (_, int index) {
           final monster = monsters[index];
           return GestureDetector(
