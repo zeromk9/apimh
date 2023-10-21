@@ -29,7 +29,7 @@ class Monster {
 
   factory Monster.fromRawJson(String str) => Monster.fromJson(json.decode(str));
 
-  String toRawJson() => json.encode(toJson());
+  //String toRawJson() => json.encode(toJson());
 
   factory Monster.fromJson(Map<String, dynamic> json) => Monster(
         id: json["id"],

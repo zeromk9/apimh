@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:apimh/widgets/widgets.dart';
@@ -20,7 +21,7 @@ class HomeScreen extends StatelessWidget {
           )
         ],
         title: const Center(
-          child: Text('Monster of MH'),
+          child: Text('MONSTERS'),
         ),
       ),
       body: Column(
@@ -33,3 +34,39 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
+/* class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  AudioPlayer player = AudioPlayer();
+
+  @override
+  void initState() {
+    super.initState();
+    playm('assets/audio/MainTheme.mp3');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final monstersProvider = Provider.of<MonstersProvider>(context);
+    return Scaffold(
+      appBar: AppBar(
+          backgroundColor: Colors.yellow.shade700,
+          title: const Center(
+            child: Text('MONSTERS'),
+          )),
+      body: Column(
+          children: [CardSwiper(monsters: monstersProvider.onDisplayMonsters)]),
+      backgroundColor: Colors.yellow.shade900,
+    );
+  }
+
+  Future<void> playm(String path) async {
+    await player.play(AssetSource(path));
+  }
+} */

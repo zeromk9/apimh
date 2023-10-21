@@ -30,10 +30,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'MONSTER HUNTER',
-      initialRoute: 'home',
+      initialRoute: '/home',
       routes: {
-        'home': (_) => const HomeScreen(),
-        'details': (_) => const DetailsScreen()
+        '/home': (_) => const HomeScreen(),
+        '/details': (_) => const DetailsScreen()
       },
     );
   }

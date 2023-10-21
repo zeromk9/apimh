@@ -13,11 +13,10 @@ class MonstersProvider extends ChangeNotifier {
 
   getMonsterInfo() async {
     String monsters = 'monsters';
-    var url = Uri.https(_baseUrl, monsters);
+    var url = Uri.https(_baseUrl, monsters); //GET https://mhw-db.com/monsters
     final response = await http.get(url);
-
-    final monsterinfo = Monster.fromRawJson(response.body);
-    onDisplayMonsters = monsterinfo as List<Monster>;
+    final monsterinfo = Response.fromRawJson(response.body);
+    onDisplayMonsters = monsterinfo.info;
 
     notifyListeners();
   }
