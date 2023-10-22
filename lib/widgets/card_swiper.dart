@@ -16,7 +16,7 @@ class CardSwiper extends StatelessWidget {
         itemCount: monsters.length,
         layout: SwiperLayout.STACK,
         itemWidth: size.width * 0.6,
-        itemHeight: size.height,
+        itemHeight: size.height * 0.6,
         itemBuilder: (_, int index) {
           final monster = monsters[index];
           return GestureDetector(
@@ -24,9 +24,8 @@ class CardSwiper extends StatelessWidget {
                 Navigator.pushNamed(context, 'details', arguments: monster),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: const FadeInImage(
-                placeholder: AssetImage('assets/no-image.jpg'),
-                image: AssetImage('assets/no-image.jpg'),
+              child: Image(
+                image: AssetImage(monster.mhimage),
               ),
             ),
           );

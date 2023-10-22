@@ -27,9 +27,16 @@ class Monster {
     required this.rewards,
   });
 
+  get mhimage {
+    if (id != null) {
+      return 'assets/imgs/monsters/$name.png';
+    }
+    return 'assets/imgs/nodata.png';
+  }
+
   factory Monster.fromRawJson(String str) => Monster.fromJson(json.decode(str));
 
-  //String toRawJson() => json.encode(toJson());
+  String toRawJson() => json.encode(toJson());
 
   factory Monster.fromJson(Map<String, dynamic> json) => Monster(
         id: json["id"],

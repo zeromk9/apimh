@@ -9,6 +9,13 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
+  bool isTextVisible = true;
+  void toggleTextVisibility() {
+    setState(() {
+      isTextVisible = !isTextVisible;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final Monster monster =
@@ -18,8 +25,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
       body: CustomScrollView(
         slivers: [
           SliverList(
-            delegate: SliverChildListDelegate.fixed(
-                [TitleAuthorImage(monster: monster)]),
+            delegate:
+                SliverChildListDelegate.fixed([_MonsterName(monster: monster)]),
           ),
         ],
       ),
@@ -27,8 +34,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 }
 
-class TitleAuthorImage extends StatelessWidget {
-  const TitleAuthorImage({super.key, required this.monster});
+class _MonsterName extends StatelessWidget {
+  const _MonsterName({super.key, required this.monster});
   final Monster monster;
 
   @override
@@ -55,24 +62,9 @@ class TitleAuthorImage extends StatelessWidget {
         ),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: FadeInImage(
+          child: Image(
             fit: BoxFit.fitHeight,
-            placeholder: const AssetImage('assets/imgs/loading.gif'),
-            imageErrorBuilder: (context, error, stackTrace) {
-              return Image.asset(
-                'assets/imgs/nodata.png',
-              );
-            },
-            image: AssetImage('assets/imgs/monsters/${monster.name}.jpg'),
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          alignment: Alignment.topLeft,
-          child: Text(
-            monster.species,
-            style: const TextStyle(fontSize: 18),
-            textAlign: TextAlign.left,
+            image: AssetImage(monster.mhimage),
           ),
         ),
       ],
