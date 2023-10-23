@@ -7,7 +7,11 @@ class MonstersProvider extends ChangeNotifier {
 
   List<Monster> onDisplayMonsters = [];
 
-  Future<void> getMonsterInfo() async {
+  MonstersProvider() {
+    getMonsterInfo();
+  }
+
+  getMonsterInfo() async {
     String monsters = 'monsters';
     var url = Uri.https(_baseUrl, monsters);
 

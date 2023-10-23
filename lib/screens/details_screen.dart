@@ -35,7 +35,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 }
 
 class _MonsterName extends StatelessWidget {
-  const _MonsterName({super.key, required this.monster});
+  const _MonsterName({required this.monster});
   final Monster monster;
 
   @override
