@@ -22,7 +22,7 @@ class Monster {
 
     // Construir la ruta completa del archivo de imagen
     String imagePath = '$appDocPath/imgs/monsters/$imageName.jpg';
-    print(imagePath);
+    //print(imagePath);
 
     // Verificar si el archivo existe
     if (await File(imagePath).exists()) {

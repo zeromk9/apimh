@@ -25,8 +25,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
       body: CustomScrollView(
         slivers: [
           SliverList(
-            delegate:
-                SliverChildListDelegate.fixed([_MonsterName(monster: monster)]),
+            delegate: SliverChildListDelegate.fixed([
+              _MonsterName(monster: monster),
+              const SizedBox(height: 20),
+              _MonsterImage(name: monster.name),
+            ]),
           ),
         ],
       ),
@@ -35,8 +38,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
 }
 
 class _MonsterName extends StatelessWidget {
-  const _MonsterName({required this.monster});
   final Monster monster;
+
+  const _MonsterName({required this.monster});
 
   @override
   Widget build(BuildContext context) {
@@ -60,14 +64,38 @@ class _MonsterName extends StatelessWidget {
             textAlign: TextAlign.left,
           ),
         ),
-/*         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: Image(
-            fit: BoxFit.fitHeight,
-            image: AssetImage(monster.mhimage),
-          ),
-        ), */
       ],
+    );
+  }
+}
+
+class _MonsterImage extends StatelessWidget {
+  final String name;
+
+  const _MonsterImage({required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Image.asset(
+        'assets/imgs/monsters/$name.jpg', // Ruta de la imagen del monstruo
+        fit: BoxFit
+            .cover, // Ajustar la imagen para que se vea completa sin importar el tamaño original
+        width:
+            250, // Tamaño específico para la imagen (ajústalo según tus necesidades)
+        height:
+            250, // Tamaño específico para la imagen (ajústalo según tus necesidades)
+        errorBuilder: (context, error, stackTrace) {
+          // En caso de error al cargar la imagen, cargar la imagen de respaldo
+          return Image.asset(
+            'assets/imgs/nodata.jpg', // Ruta de la imagen de respaldo
+            fit: BoxFit
+                .cover, // Ajustar la imagen de respaldo de la misma manera
+            width: 250, // Tamaño específico para la imagen de respaldo
+            height: 250, // Tamaño específico para la imagen de respaldo
+          );
+        },
+      ),
     );
   }
 }

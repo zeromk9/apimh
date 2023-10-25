@@ -1,19 +1,13 @@
 import 'dart:convert';
-
-import 'package:apimh/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:apimh/models/models.dart';
 
 class MonstersProvider extends ChangeNotifier {
   final String _baseUrl = 'mhw-db.com';
-
   List<Monster> onDisplayMonsters = [];
 
-  MonstersProvider() {
-    getMonsterInfo();
-  }
-
-  getMonsterInfo() async {
+  Future<void> getMonsterInfo({List<String>? names}) async {
     String monsters = 'monsters';
     var url = Uri.https(_baseUrl, monsters);
 
@@ -21,24 +15,32 @@ class MonstersProvider extends ChangeNotifier {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        // Imprimir la respuesta JSON en la consola
-/*         print('Respuesta JSON de la API:');
-        print(response.body); */
-
         final List<dynamic> jsonResponse = json.decode(response.body);
         final monsterInfo = Response.fromJson(jsonResponse);
 
-        onDisplayMonsters = monsterInfo.info;
+        if (names != null && names.isNotEmpty) {
+          onDisplayMonsters = monsterInfo.info
+              .where((monster) => names.contains(monster.name))
+              .toList();
+        } else {
+          onDisplayMonsters = monsterInfo.info;
+        }
+
+        // Imprimir la lista solo la primera vez que se obtienen los datos
+/*         if (!_isListPrinted) {
+          print('Lista de monstruos obtenida de la API:');
+          onDisplayMonsters.forEach((monster) {
+            print('ID: ${monster.id}, Nombre: ${monster.name}');
+          });
+          _isListPrinted = true;
+        } */
 
         notifyListeners();
       } else {
-        // Si la solicitud no fue exitosa, imprimir el código de estado
         print('Error en la solicitud: ${response.statusCode}');
       }
-    } catch (error /*, stackTrace*/) {
+    } catch (error) {
       print('Error: $error');
-/*       print('StackTrace: $stackTrace');
-      print('JSON de la respuesta:'); */
     }
   }
 }
