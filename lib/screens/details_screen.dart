@@ -20,6 +20,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Widget build(BuildContext context) {
     final Monster monster =
         ModalRoute.of(context)?.settings.arguments as Monster;
+
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.orange, title: Text(monster.name)),
       body: CustomScrollView(
