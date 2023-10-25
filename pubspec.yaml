@@ -64,6 +64,8 @@ flutter:
     - assets/imgs/weapons/
     - assets/imgs/nodata.jpg
     - assets/audio/
+    - assets/audio/monsters/
+    - assets/audio/menus/
     - assets/videos/
     - assets/videos/monsters/
     - assets/videos/weapons/
