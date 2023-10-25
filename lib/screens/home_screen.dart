@@ -13,12 +13,12 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-/*         actions: [
+        actions: [
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.search_outlined),
           )
-        ], */
+        ],
         title: const Center(
           child: Text('MONSTERS'),
         ),

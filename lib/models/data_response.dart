@@ -1,5 +1,4 @@
-import 'dart:convert';
-import 'package:apimh/models/models.dart';
+import 'package:apimh/models/data_monsters.dart';
 
 class Response {
   List<Monster> info;
@@ -8,10 +7,10 @@ class Response {
     required this.info,
   });
 
-  factory Response.fromRawJson(String str) =>
-      Response.fromJson(json.decode(str));
-
-  factory Response.fromJson(Map<String, dynamic> json) => Response(
-        info: List<Monster>.from(json["data"].map((x) => Monster.fromJson(x))),
-      );
+  factory Response.fromJson(List<dynamic> json) {
+    // Parsear la lista json y crear una lista de Monster
+    return Response(
+      info: List<Monster>.from(json.map((x) => Monster.fromJson(x))),
+    );
+  }
 }

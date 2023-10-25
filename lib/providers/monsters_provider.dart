@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:apimh/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -20,19 +22,23 @@ class MonstersProvider extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         // Imprimir la respuesta JSON en la consola
-        print('Respuesta JSON de la API:');
-        print(response.body);
+/*         print('Respuesta JSON de la API:');
+        print(response.body); */
 
-        final monsterInfo = Response.fromRawJson(response.body);
+        final List<dynamic> jsonResponse = json.decode(response.body);
+        final monsterInfo = Response.fromJson(jsonResponse);
+
         onDisplayMonsters = monsterInfo.info;
+
         notifyListeners();
       } else {
         // Si la solicitud no fue exitosa, imprimir el código de estado
         print('Error en la solicitud: ${response.statusCode}');
       }
-    } catch (error) {
-      // Capturar y manejar cualquier excepción que ocurra durante la solicitud
+    } catch (error /*, stackTrace*/) {
       print('Error: $error');
+/*       print('StackTrace: $stackTrace');
+      print('JSON de la respuesta:'); */
     }
   }
 }

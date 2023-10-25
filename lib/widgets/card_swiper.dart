@@ -24,10 +24,10 @@ class CardSwiper extends StatelessWidget {
                 Navigator.pushNamed(context, 'details', arguments: monster),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: FadeInImage(
+/*               child: FadeInImage(
                 placeholder: const AssetImage('assets/no-image.jpg'),
                 image: NetworkImage(monster.mhimage),
-              ),
+              ), */
             ),
           );
         },
