@@ -1,0 +1,980 @@
+NOMBRE_DEL_ARCHIVO: main.dart
+CONTENIDO:
+import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:apimh/providers/providers.dart';
+
+import 'package:apimh/screens/screens.dart';
+
+
+
+void main() => runApp(const AppState());
+
+
+
+class AppState extends StatelessWidget {
+
+  const AppState({super.key});
+
+
+
+  @override
+
+  Widget build(BuildContext context) {
+
+    return MultiProvider(
+
+      providers: [
+
+        ChangeNotifierProvider(
+
+          create: (_) => MonstersProvider(),
+
+          lazy: false,
+
+        )
+
+      ],
+
+      child: const MyApp(),
+
+    );
+
+  }
+
+}
+
+
+
+class MyApp extends StatelessWidget {
+
+  const MyApp({super.key});
+
+
+
+  @override
+
+  Widget build(BuildContext context) {
+
+    return MaterialApp(
+
+      debugShowCheckedModeBanner: false,
+
+      title: 'MONSTER HUNTER',
+
+      initialRoute: '/home',
+
+      routes: {
+
+        '/home': (_) => const HomeScreen(),
+
+        '/details': (_) => const DetailsScreen()
+
+      },
+
+    );
+
+  }
+
+}
+
+
+==================================================
+NOMBRE_DEL_ARCHIVO: data_monsters.dart
+CONTENIDO:
+import 'dart:convert';
+
+import 'package:path_provider/path_provider.dart';
+
+import 'dart:io';
+
+
+
+class Monster {
+
+  int id;
+
+  String species;
+
+  String name;
+
+  String description;
+
+
+
+  Monster({
+
+    required this.id,
+
+    required this.species,
+
+    required this.name,
+
+    required this.description,
+
+  });
+
+
+
+  Future<String?> getImagePath(String imageName) async {
+
+    // Obtener el directorio de documentos de la aplicaciÃ³n
+
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+
+    String appDocPath = appDocDir.path;
+
+
+
+    // Construir la ruta completa del archivo de imagen
+
+    String imagePath = '$appDocPath/imgs/monsters/$imageName.jpg';
+
+    //print(imagePath);
+
+
+
+    // Verificar si el archivo existe
+
+    if (await File(imagePath).exists()) {
+
+      return imagePath;
+
+    } else {
+
+      // Si el archivo no existe, puedes devolver null o una ruta predeterminada si quieres mostrar una imagen predeterminada.
+
+      return null;
+
+    }
+
+  }
+
+
+
+  Future<bool> doesImageExist() async {
+
+    String? imagePath = await getImagePath(name);
+
+    return imagePath != null && File(imagePath).existsSync();
+
+  }
+
+
+
+  factory Monster.fromRawJson(String str) => Monster.fromJson(json.decode(str));
+
+
+
+  factory Monster.fromJson(Map<String, dynamic> json) => Monster(
+
+        id: json["id"],
+
+        species: json["species"],
+
+        name: json["name"],
+
+        description: json["description"],
+
+      );
+
+
+
+  Map<String, dynamic> toJson() => {
+
+        "id": id,
+
+        "species": species,
+
+        "name": name,
+
+        "description": description,
+
+      };
+
+}
+
+
+==================================================
+NOMBRE_DEL_ARCHIVO: data_response.dart
+CONTENIDO:
+import 'package:apimh/models/data_monsters.dart';
+
+
+
+class Response {
+
+  List<Monster> info;
+
+
+
+  Response({
+
+    required this.info,
+
+  });
+
+
+
+  factory Response.fromJson(List<dynamic> json) {
+
+    // Parsear la lista json y crear una lista de Monster
+
+    return Response(
+
+      info: List<Monster>.from(json.map((x) => Monster.fromJson(x))),
+
+    );
+
+  }
+
+}
+
+
+==================================================
+NOMBRE_DEL_ARCHIVO: models.dart
+CONTENIDO:
+export 'package:apimh/models/data_monsters.dart';
+
+export 'package:apimh/models/data_response.dart';
+
+
+==================================================
+NOMBRE_DEL_ARCHIVO: monsters_provider.dart
+CONTENIDO:
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+
+import 'package:http/http.dart' as http;
+
+import 'package:apimh/models/models.dart';
+
+
+
+class MonstersProvider extends ChangeNotifier {
+
+  final String _baseUrl = 'mhw-db.com';
+
+  List<Monster> onDisplayMonsters = [];
+
+
+
+  Future<void> getMonsterInfo({List<String>? names}) async {
+
+    String monsters = 'monsters';
+
+    var url = Uri.https(_baseUrl, monsters);
+
+
+
+    try {
+
+      final response = await http.get(url);
+
+
+
+      if (response.statusCode == 200) {
+
+        final List<dynamic> jsonResponse = json.decode(response.body);
+
+        final monsterInfo = Response.fromJson(jsonResponse);
+
+
+
+        if (names != null && names.isNotEmpty) {
+
+          onDisplayMonsters = monsterInfo.info
+
+              .where((monster) => names.contains(monster.name))
+
+              .toList();
+
+        } else {
+
+          onDisplayMonsters = monsterInfo.info;
+
+        }
+
+
+
+        // Imprimir la lista solo la primera vez que se obtienen los datos
+
+/*         if (!_isListPrinted) {
+
+          print('Lista de monstruos obtenida de la API:');
+
+          onDisplayMonsters.forEach((monster) {
+
+            print('ID: ${monster.id}, Nombre: ${monster.name}');
+
+          });
+
+          _isListPrinted = true;
+
+        } */
+
+
+
+        notifyListeners();
+
+      } else {
+
+        // ignore: avoid_print
+
+        print('Error en la solicitud: ${response.statusCode}');
+
+      }
+
+    } catch (error) {
+
+      // ignore: avoid_print
+
+      print('Error: $error');
+
+    }
+
+  }
+
+}
+
+
+==================================================
+NOMBRE_DEL_ARCHIVO: providers.dart
+CONTENIDO:
+export 'package:apimh/providers/monsters_provider.dart';
+
+
+==================================================
+NOMBRE_DEL_ARCHIVO: details_screen.dart
+CONTENIDO:
+import 'package:chewie/chewie.dart';
+
+import 'package:flutter/material.dart';
+
+import 'package:apimh/models/models.dart';
+
+import 'package:video_player/video_player.dart';
+
+
+
+class DetailsScreen extends StatefulWidget {
+
+  const DetailsScreen({super.key});
+
+
+
+  @override
+
+  State<DetailsScreen> createState() => _DetailsScreenState();
+
+}
+
+
+
+class _DetailsScreenState extends State<DetailsScreen> {
+
+  bool isTextVisible = true;
+
+  void toggleTextVisibility() {
+
+    setState(() {
+
+      isTextVisible = !isTextVisible;
+
+    });
+
+  }
+
+
+
+  Widget _buildVideoPlayer(String videoFileName) {
+
+    VideoPlayerController videoPlayerController = VideoPlayerController.asset(
+
+        'assets/videos/monsters/$videoFileName.mp4');
+
+
+
+    ChewieController chewieController = ChewieController(
+
+      videoPlayerController: videoPlayerController,
+
+      autoPlay: true,
+
+      looping: true,
+
+      // Puedes personalizar mÃ¡s opciones aquÃ­ segÃºn tus necesidades
+
+    );
+
+
+
+    return Chewie(
+
+      controller: chewieController,
+
+    );
+
+  }
+
+
+
+  @override
+
+  Widget build(BuildContext context) {
+
+    final Monster monster =
+
+        ModalRoute.of(context)?.settings.arguments as Monster;
+
+
+
+    return Scaffold(
+
+      appBar: AppBar(backgroundColor: Colors.orange, title: Text(monster.name)),
+
+      body: CustomScrollView(
+
+        slivers: [
+
+          SliverList(
+
+            delegate: SliverChildListDelegate.fixed([
+
+              _MonsterName(monster: monster),
+
+              const SizedBox(height: 20),
+
+              _MonsterImage(name: monster.name),
+
+              const SizedBox(height: 20),
+
+              _buildVideoPlayer(
+
+                  monster.name), // Agrega el video despuÃ©s de la imagen
+
+            ]),
+
+          ),
+
+        ],
+
+      ),
+
+    );
+
+  }
+
+}
+
+
+
+// Resto del cÃ³digo de _MonsterName y _MonsterImage
+
+
+
+class _MonsterName extends StatelessWidget {
+
+  final Monster monster;
+
+
+
+  const _MonsterName({required this.monster});
+
+
+
+  @override
+
+  Widget build(BuildContext context) {
+
+    return Column(
+
+      children: [
+
+        Container(
+
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+
+          alignment: Alignment.topLeft,
+
+          child: Text(
+
+            monster.name,
+
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+
+            textAlign: TextAlign.left,
+
+          ),
+
+        ),
+
+        Container(
+
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+
+          alignment: Alignment.topLeft,
+
+          child: Text(
+
+            monster.description,
+
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+
+            textAlign: TextAlign.left,
+
+          ),
+
+        ),
+
+      ],
+
+    );
+
+  }
+
+}
+
+
+
+class _MonsterImage extends StatelessWidget {
+
+  final String name;
+
+
+
+  const _MonsterImage({required this.name});
+
+
+
+  @override
+
+  Widget build(BuildContext context) {
+
+    return Center(
+
+      child: Image.asset(
+
+        'assets/imgs/monsters/$name.jpg', // Ruta de la imagen del monstruo
+
+        fit: BoxFit
+
+            .cover, // Ajustar la imagen para que se vea completa sin importar el tamaÃ±o original
+
+        width:
+
+            250, // TamaÃ±o especÃ­fico para la imagen (ajÃºstalo segÃºn tus necesidades)
+
+        height:
+
+            250, // TamaÃ±o especÃ­fico para la imagen (ajÃºstalo segÃºn tus necesidades)
+
+        errorBuilder: (context, error, stackTrace) {
+
+          // En caso de error al cargar la imagen, cargar la imagen de respaldo
+
+          return Image.asset(
+
+            'assets/imgs/nodata.jpg', // Ruta de la imagen de respaldo
+
+            fit: BoxFit
+
+                .cover, // Ajustar la imagen de respaldo de la misma manera
+
+            width: 250, // TamaÃ±o especÃ­fico para la imagen de respaldo
+
+            height: 250, // TamaÃ±o especÃ­fico para la imagen de respaldo
+
+          );
+
+        },
+
+      ),
+
+    );
+
+  }
+
+}
+
+
+==================================================
+NOMBRE_DEL_ARCHIVO: home_screen.dart
+CONTENIDO:
+import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:apimh/widgets/widgets.dart';
+
+import 'package:apimh/providers/providers.dart';
+
+import 'package:chewie/chewie.dart';
+
+import 'package:video_player/video_player.dart';
+
+
+
+class HomeScreen extends StatelessWidget {
+
+  const HomeScreen({super.key});
+
+
+
+  Widget _buildIntroVideo() {
+
+    VideoPlayerController videoPlayerController =
+
+        VideoPlayerController.asset('assets/videos/menus/trailer.mp4');
+
+
+
+    ChewieController chewieController = ChewieController(
+
+      videoPlayerController: videoPlayerController,
+
+      autoPlay: true,
+
+      looping: true,
+
+      // Puedes personalizar mÃ¡s opciones aquÃ­ segÃºn tus necesidades
+
+    );
+
+
+
+    return SizedBox(
+
+      width: 150, // Ancho del contenedor
+
+      height: 150, // Alto del contenedor
+
+      child: Chewie(
+
+        controller: chewieController,
+
+      ),
+
+    );
+
+  }
+
+
+
+  @override
+
+  Widget build(BuildContext context) {
+
+    final monstersProvider = Provider.of<MonstersProvider>(context);
+
+    List<String> nombresDeseados = [
+
+      "Anjanath",
+
+      "Azure Rathalos",
+
+      "Barioth",
+
+      "Barroth",
+
+      "Black Diablos",
+
+      "Deviljho",
+
+      "Diablos",
+
+      "Dodogama",
+
+      "Great Girros",
+
+      "Jyuratodus",
+
+      "Kirin",
+
+      "Kulu-Ya-Ku",
+
+      "Kushala Daora",
+
+      "Lavasioth",
+
+      "Legiana",
+
+      "Lunastra",
+
+      "Nergigante",
+
+      "Odogaron",
+
+      "Paolumu",
+
+      "Pink Rathian",
+
+      "Pukei-Pukei",
+
+      "Radobaan",
+
+      "Rathalos",
+
+      "Rathian",
+
+      "Teostra",
+
+      "Tobi-Kadachi",
+
+      "Tzitzi-Ya-Ku",
+
+      "Uragaan",
+
+      "Vaal Hazak",
+
+      "Xeno'jiiva",
+
+      "Zorah Magdaros",
+
+      "Zinogre"
+
+    ];
+
+
+
+    // Llamar al mÃ©todo getMonsterInfo con la lista de nombres deseados
+
+    Future<void> loadMonsters() async {
+
+      await monstersProvider.getMonsterInfo(names: nombresDeseados);
+
+    }
+
+
+
+    // Llamar al mÃ©todo de carga de monstruos cuando se construye el widget
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      loadMonsters();
+
+    });
+
+
+
+    return Scaffold(
+
+      appBar: AppBar(
+
+        elevation: 0,
+
+        actions: [
+
+          IconButton(
+
+            onPressed: () {},
+
+            icon: const Icon(Icons.search_outlined),
+
+          )
+
+        ],
+
+        title: const Center(
+
+          child: Text('MONSTERS'),
+
+        ),
+
+      ),
+
+      body: Consumer<MonstersProvider>(
+
+        builder: (_, provider, __) {
+
+          if (provider.onDisplayMonsters.isEmpty) {
+
+            return const Center(child: CircularProgressIndicator());
+
+          } else {
+
+            return Column(
+
+              children: [
+
+                _buildIntroVideo(), // Agrega el video antes del swiper
+
+                CardSwiper(
+
+                  monsters: provider.onDisplayMonsters,
+
+                ),
+
+              ],
+
+            );
+
+          }
+
+        },
+
+      ),
+
+    );
+
+  }
+
+}
+
+
+==================================================
+NOMBRE_DEL_ARCHIVO: screens.dart
+CONTENIDO:
+export 'package:apimh/screens/details_screen.dart';
+
+export 'package:apimh/screens/home_screen.dart';
+
+
+==================================================
+NOMBRE_DEL_ARCHIVO: card_swiper.dart
+CONTENIDO:
+import 'package:card_swiper/card_swiper.dart';
+
+import 'package:flutter/material.dart';
+
+import 'package:apimh/models/models.dart';
+
+
+
+class CardSwiper extends StatelessWidget {
+
+  final List<Monster> monsters;
+
+  const CardSwiper({super.key, required this.monsters});
+
+
+
+  @override
+
+  Widget build(BuildContext context) {
+
+    final size = MediaQuery.of(context).size;
+
+    return SingleChildScrollView(
+
+      child: SizedBox(
+
+        width: double.infinity,
+
+        height: size.height * 0.8,
+
+        child: Swiper(
+
+          itemCount: monsters.length,
+
+          layout: SwiperLayout.STACK,
+
+          itemWidth: size.width * 0.6,
+
+          itemHeight: size.height * 0.6,
+
+          itemBuilder: (_, int index) {
+
+            final monster = monsters[index];
+
+            return GestureDetector(
+
+              onTap: () {
+
+                //print("Pushing to details screen");
+
+                Navigator.pushNamed(context, '/details', arguments: monster);
+
+              },
+
+              child: ClipRRect(
+
+                borderRadius: BorderRadius.circular(20),
+
+                child: Column(
+
+                  children: [
+
+                    Container(
+
+                      padding: const EdgeInsets.all(10),
+
+                      color: Colors.orange,
+
+                      child: Text(
+
+                        monster.name,
+
+                        style: const TextStyle(
+
+                          color: Colors.white,
+
+                          fontSize: 24, // TamaÃ±o grande para el texto
+
+                          fontWeight: FontWeight.bold,
+
+                        ),
+
+                      ),
+
+                    ),
+
+                    Image.asset(
+
+                      'assets/imgs/monsters/${monster.name}.jpg',
+
+                      fit: BoxFit.cover,
+
+                      width: 250,
+
+                      height: 250,
+
+                      errorBuilder: (context, error, stackTrace) {
+
+                        return Image.asset(
+
+                          'assets/imgs/nodata.jpg',
+
+                          fit: BoxFit.cover,
+
+                          width: 250,
+
+                          height: 250,
+
+                        );
+
+                      },
+
+                    ),
+
+                  ],
+
+                ),
+
+              ),
+
+            );
+
+          },
+
+        ),
+
+      ),
+
+    );
+
+  }
+
+}
+
+
+==================================================
+NOMBRE_DEL_ARCHIVO: widgets.dart
+CONTENIDO:
+export 'package:apimh/widgets/card_swiper.dart';
+
+
+==================================================

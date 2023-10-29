@@ -26,15 +26,6 @@ class MonstersProvider extends ChangeNotifier {
           onDisplayMonsters = monsterInfo.info;
         }
 
-        // Imprimir la lista solo la primera vez que se obtienen los datos
-/*         if (!_isListPrinted) {
-          print('Lista de monstruos obtenida de la API:');
-          onDisplayMonsters.forEach((monster) {
-            print('ID: ${monster.id}, Nombre: ${monster.name}');
-          });
-          _isListPrinted = true;
-        } */
-
         notifyListeners();
       } else {
         print('Error en la solicitud: ${response.statusCode}');
