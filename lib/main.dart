@@ -13,7 +13,7 @@ class AppState extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => MonstersProvider(),
+          create: (_) => DataProvider(),
           lazy: false,
         )
       ],
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/home',
       routes: {
         '/home': (_) => const HomeScreen(),
-        '/details': (_) => const DetailsScreen()
+        '/details': (_) => const DetailsMonstersScreen()
       },
     );
   }

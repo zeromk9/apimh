@@ -1,1 +1,1 @@
-export 'package:apimh/providers/monsters_provider.dart';
+export 'package:apimh/providers/data_provider.dart';

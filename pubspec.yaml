@@ -57,15 +57,19 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
+  #Imagenes:
     - assets/imgs/
     - assets/imgs/monsters/
     - assets/imgs/armors/
     - assets/imgs/menus/
     - assets/imgs/weapons/
     - assets/imgs/nodata.jpg
+    - assets/imgs/zones/
+  #Audio
     - assets/audio/
     - assets/audio/monsters/
     - assets/audio/menus/
+  #Videos
     - assets/videos/
     - assets/videos/monsters/
     - assets/videos/weapons/

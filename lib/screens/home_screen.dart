@@ -8,7 +8,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final monstersProvider = Provider.of<MonstersProvider>(context);
+    final monstersProvider = Provider.of<DataProvider>(context);
     List<String> nombresDeseados = [
       "Anjanath",
       "Azure Rathalos",
@@ -46,7 +46,7 @@ class HomeScreen extends StatelessWidget {
 
     // Llamar al método getMonsterInfo con la lista de nombres deseados
     Future<void> loadMonsters() async {
-      await monstersProvider.getMonsterInfo(names: nombresDeseados);
+      await monstersProvider.getMonsterFilter(names: nombresDeseados);
     }
 
     // Llamar al método de carga de monstruos cuando se construye el widget
@@ -67,18 +67,16 @@ class HomeScreen extends StatelessWidget {
           child: Text('MONSTERS'),
         ),
       ),
-      body: Consumer<MonstersProvider>(
+      body: Consumer<DataProvider>(
         builder: (_, provider, __) {
           if (provider.onDisplayMonsters.isEmpty) {
             return const Center(
-                child:
-                    CircularProgressIndicator()); // Muestra un indicador de carga mientras se obtienen los datos.
+              child: CircularProgressIndicator(),
+            ); // Muestra un indicador de carga mientras se obtienen los datos.
           } else {
             return Column(
               children: [
-                CardSwiper(
-                  monsters: provider.onDisplayMonsters,
-                ),
+                MonsterSwiper(monsters: provider.onDisplayMonsters),
               ],
             );
           }

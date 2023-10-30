@@ -2,9 +2,9 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:apimh/models/models.dart';
 
-class CardSwiper extends StatelessWidget {
+class MonsterSwiper extends StatelessWidget {
   final List<Monster> monsters;
-  const CardSwiper({super.key, required this.monsters});
+  const MonsterSwiper({super.key, required this.monsters});
 
   @override
   Widget build(BuildContext context) {

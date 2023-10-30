@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:apimh/models/models.dart';
 
-class DetailsScreen extends StatefulWidget {
-  const DetailsScreen({super.key});
+class DetailsMonstersScreen extends StatefulWidget {
+  const DetailsMonstersScreen({super.key});
 
   @override
-  State<DetailsScreen> createState() => _DetailsScreenState();
+  State<DetailsMonstersScreen> createState() => _DetailsMonstersScreenState();
 }
 
-class _DetailsScreenState extends State<DetailsScreen> {
+class _DetailsMonstersScreenState extends State<DetailsMonstersScreen> {
   bool isTextVisible = true;
   void toggleTextVisibility() {
     setState(() {
