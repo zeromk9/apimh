@@ -22,20 +22,19 @@ class DataProvider extends ChangeNotifier {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = json.decode(response
-            .body); //*** Este estaba como final List<dynamic> jsonResponse = json.decode(response.body); ***
+        final jsonResponse = json.decode(response.body);
         final responseData = Response.fromJson(jsonResponse);
 
         if (endpoint == 'monsters') {
           onDisplayMonsters = responseData.monsters;
-        } else if (endpoint == 'armor/sets') {
+/*         } else if (endpoint == 'armor/sets') {
           onDisplayArmors = responseData.armors;
         } else if (endpoint == 'items') {
           onDisplayItems = responseData.items;
         } else if (endpoint == 'locations') {
           onDisplayZones = responseData.zones;
         } else if (endpoint == 'weapons') {
-          onDisplayWeapons = responseData.weapons;
+          onDisplayWeapons = responseData.weapons; */
         }
 
         notifyListeners();

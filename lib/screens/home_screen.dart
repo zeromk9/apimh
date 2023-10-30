@@ -77,6 +77,10 @@ class HomeScreen extends StatelessWidget {
             return Column(
               children: [
                 MonsterSwiper(monsters: provider.onDisplayMonsters),
+                WeaponsSwiper(weapons: provider.onDisplayWeapons),
+                ArmorsSwiper(armors: provider.onDisplayArmors),
+                ItemsSwiper(items: provider.onDisplayItems),
+                ZonesSwiper(zones: provider.onDisplayZones),
               ],
             );
           }
