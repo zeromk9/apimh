@@ -5,7 +5,19 @@ import 'package:apimh/widgets/widgets.dart';
 
 class MainSwiper extends StatelessWidget {
   final List<Monster> monsters;
-  const MainSwiper({Key? key, required this.monsters}) : super(key: key);
+  final List<Armors> armors;
+  final List<Weapons> weapons;
+  final List<Items> items;
+  final List<Zones> zones;
+
+  const MainSwiper({
+    Key? key,
+    required this.monsters,
+    required this.armors,
+    required this.weapons,
+    required this.items,
+    required this.zones,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,16 +27,15 @@ class MainSwiper extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           switch (index) {
             case 0:
-              return MonsterSwiper(
-                  monsters: monsters); // Pasar la lista de monstruos
+              return MonsterSwiper(monsters: monsters);
             case 1:
-              return WeaponsSwiper(); // Pasar los datos de armas si es necesario
+              return WeaponsSwiper(weapons: weapons);
             case 2:
-              return ArmorsSwiper(); // Pasar los datos de armaduras si es necesario
+              return ArmorsSwiper(armors: armors);
             case 3:
-              return ItemsSwiper(); // Pasar los datos de items si es necesario
+              return ItemsSwiper(items: items);
             case 4:
-              return LocalizationsSwiper(); // Pasar los datos de localizaciones si es necesario
+              return ZonesSwiper(zones: zones);
             default:
               return Container();
           }

@@ -33,7 +33,11 @@ class MyApp extends StatelessWidget {
       initialRoute: '/home',
       routes: {
         '/home': (_) => const HomeScreen(),
-        '/details': (_) => const DetailsMonstersScreen()
+        '/monsters_details': (_) => const DetailsMonstersScreen(),
+        '/armors_details': (_) => const DetailsArmorsScreen(),
+        '/weapons_details': (_) => const DetailsWeaponsScreen(),
+        '/items_details': (_) => const DetailsItemsScreen(),
+        '/zones_details': (_) => const DetailsZonesScreen(),
       },
     );
   }
