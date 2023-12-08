@@ -15,15 +15,13 @@ class Response {
     required this.zones,
   });
 
-  factory Response.fromJson(Map<String, dynamic> json) {
+  factory Response.fromJson(List<dynamic> json) {
     return Response(
-      monsters:
-          List<Monster>.from(json['monsters'].map((x) => Monster.fromJson(x))),
-      armors: List<Armors>.from(json['armors'].map((x) => Armors.fromJson(x))),
-      items: List<Items>.from(json['items'].map((x) => Items.fromJson(x))),
-      weapons:
-          List<Weapons>.from(json['weapons'].map((x) => Weapons.fromJson(x))),
-      zones: List<Zones>.from(json['zones'].map((x) => Zones.fromJson(x))),
+      monsters: List<Monster>.from(json.map((x) => Monster.fromJson(x))),
+      armors: List<Armors>.from(json.map((x) => Armors.fromJson(x))),
+      items: List<Items>.from(json.map((x) => Items.fromJson(x))),
+      weapons: List<Weapons>.from(json.map((x) => Weapons.fromJson(x))),
+      zones: List<Zones>.from(json.map((x) => Zones.fromJson(x))),
     );
   }
 }

@@ -46,7 +46,7 @@ class HomeScreen extends StatelessWidget {
 
     // Llamar al método getMonsterInfo con la lista de nombres deseados
     Future<void> loadMonsters() async {
-      await monstersProvider.getMonsterFilter(names: nombresDeseados);
+      await monstersProvider.getData(names: nombresDeseados);
     }
 
     // Llamar al método de carga de monstruos cuando se construye el widget

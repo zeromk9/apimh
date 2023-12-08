@@ -1,980 +1,1360 @@
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\main.dart
 NOMBRE_DEL_ARCHIVO: main.dart
 CONTENIDO:
-import 'package:flutter/material.dart';
-
-import 'package:provider/provider.dart';
-
-import 'package:apimh/providers/providers.dart';
-
-import 'package:apimh/screens/screens.dart';
-
-
-
-void main() => runApp(const AppState());
-
-
-
-class AppState extends StatelessWidget {
-
-  const AppState({super.key});
-
-
-
-  @override
-
-  Widget build(BuildContext context) {
-
-    return MultiProvider(
-
-      providers: [
-
-        ChangeNotifierProvider(
-
-          create: (_) => MonstersProvider(),
-
-          lazy: false,
-
-        )
-
-      ],
-
-      child: const MyApp(),
-
-    );
-
-  }
-
-}
-
-
-
-class MyApp extends StatelessWidget {
-
-  const MyApp({super.key});
-
-
-
-  @override
-
-  Widget build(BuildContext context) {
-
-    return MaterialApp(
-
-      debugShowCheckedModeBanner: false,
-
-      title: 'MONSTER HUNTER',
-
-      initialRoute: '/home',
-
-      routes: {
-
-        '/home': (_) => const HomeScreen(),
-
-        '/details': (_) => const DetailsScreen()
-
-      },
-
-    );
-
-  }
-
-}
-
-
-==================================================
-NOMBRE_DEL_ARCHIVO: data_monsters.dart
-CONTENIDO:
-import 'dart:convert';
-
-import 'package:path_provider/path_provider.dart';
-
-import 'dart:io';
-
-
-
-class Monster {
-
-  int id;
-
-  String species;
-
-  String name;
-
-  String description;
-
-
-
-  Monster({
-
-    required this.id,
-
-    required this.species,
-
-    required this.name,
-
-    required this.description,
-
-  });
-
-
-
-  Future<String?> getImagePath(String imageName) async {
-
-    // Obtener el directorio de documentos de la aplicaciÃ³n
-
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-
-    String appDocPath = appDocDir.path;
-
-
-
-    // Construir la ruta completa del archivo de imagen
-
-    String imagePath = '$appDocPath/imgs/monsters/$imageName.jpg';
-
-    //print(imagePath);
-
-
-
-    // Verificar si el archivo existe
-
-    if (await File(imagePath).exists()) {
-
-      return imagePath;
-
-    } else {
-
-      // Si el archivo no existe, puedes devolver null o una ruta predeterminada si quieres mostrar una imagen predeterminada.
-
-      return null;
-
-    }
-
-  }
-
-
-
-  Future<bool> doesImageExist() async {
-
-    String? imagePath = await getImagePath(name);
-
-    return imagePath != null && File(imagePath).existsSync();
-
-  }
-
-
-
-  factory Monster.fromRawJson(String str) => Monster.fromJson(json.decode(str));
-
-
-
-  factory Monster.fromJson(Map<String, dynamic> json) => Monster(
-
-        id: json["id"],
-
-        species: json["species"],
-
-        name: json["name"],
-
-        description: json["description"],
-
-      );
-
-
-
-  Map<String, dynamic> toJson() => {
-
-        "id": id,
-
-        "species": species,
-
-        "name": name,
-
-        "description": description,
-
-      };
-
-}
-
-
-==================================================
-NOMBRE_DEL_ARCHIVO: data_response.dart
-CONTENIDO:
-import 'package:apimh/models/data_monsters.dart';
-
-
-
-class Response {
-
-  List<Monster> info;
-
-
-
-  Response({
-
-    required this.info,
-
-  });
-
-
-
-  factory Response.fromJson(List<dynamic> json) {
-
-    // Parsear la lista json y crear una lista de Monster
-
-    return Response(
-
-      info: List<Monster>.from(json.map((x) => Monster.fromJson(x))),
-
-    );
-
-  }
-
-}
-
-
-==================================================
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:apimh/providers/providers.dart';
+import 'package:apimh/screens/screens.dart';
+
+void main() => runApp(const AppState());
+
+class AppState extends StatelessWidget {
+  const AppState({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => DataProvider(),
+          lazy: false,
+        )
+      ],
+      child: const MyApp(),
+    );
+  }
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'MONSTER HUNTER',
+      initialRoute: '/home',
+      routes: {
+        '/home': (_) => const HomeScreen(),
+        '/monsters_details': (_) => const DetailsMonstersScreen(),
+        '/armors_details': (_) => const DetailsArmorsScreen(),
+        '/weapons_details': (_) => const DetailsWeaponsScreen(),
+        '/items_details': (_) => const DetailsItemsScreen(),
+        '/zones_details': (_) => const DetailsZonesScreen(),
+      },
+    );
+  }
+}
+
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\models\models.dart
 NOMBRE_DEL_ARCHIVO: models.dart
 CONTENIDO:
-export 'package:apimh/models/data_monsters.dart';
+export 'package:apimh/models/hunter/armors_data.dart';
+export 'package:apimh/models/hunter/items_data.dart';
+export 'package:apimh/models/monsters/monsters_data.dart';
+export 'package:apimh/models/response_data.dart';
+export 'package:apimh/models/hunter/weapons_data.dart';
+export 'package:apimh/models/monsters/zones_data.dart';
 
-export 'package:apimh/models/data_response.dart';
-
-
-==================================================
-NOMBRE_DEL_ARCHIVO: monsters_provider.dart
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\models\response_data.dart
+NOMBRE_DEL_ARCHIVO: response_data.dart
 CONTENIDO:
-import 'dart:convert';
+import 'package:apimh/models/models.dart';
+
+class Response {
+  List<Monster> monsters;
+  List<Armors> armors;
+  List<Items> items;
+  List<Weapons> weapons;
+  List<Zones> zones;
+
+  Response({
+    required this.monsters,
+    required this.armors,
+    required this.items,
+    required this.weapons,
+    required this.zones,
+  });
+
+  factory Response.fromJson(Map<String, dynamic> json) {
+    return Response(
+      monsters:
+          List<Monster>.from(json['monsters'].map((x) => Monster.fromJson(x))),
+      armors: List<Armors>.from(json['armors'].map((x) => Armors.fromJson(x))),
+      items: List<Items>.from(json['items'].map((x) => Items.fromJson(x))),
+      weapons:
+          List<Weapons>.from(json['weapons'].map((x) => Weapons.fromJson(x))),
+      zones: List<Zones>.from(json['zones'].map((x) => Zones.fromJson(x))),
+    );
+  }
+}
 
-import 'package:flutter/material.dart';
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\models\hunter\armors_data.dart
+NOMBRE_DEL_ARCHIVO: armors_data.dart
+CONTENIDO:
+import 'dart:convert';
+
+class Armors {
+  int id;
+  String name;
+  List<Piece> pieces;
+  Bonus bonus;
+
+  Armors({
+    required this.id,
+    required this.name,
+    required this.pieces,
+    required this.bonus,
+  });
+
+  factory Armors.fromRawJson(String str) => Armors.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Armors.fromJson(Map<String, dynamic> json) => Armors(
+        id: json["id"],
+        name: json["name"],
+        pieces: List<Piece>.from(json["pieces"].map((x) => Piece.fromJson(x))),
+        bonus: Bonus.fromJson(json["bonus"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "pieces": List<dynamic>.from(pieces.map((x) => x.toJson())),
+        "bonus": bonus.toJson(),
+      };
+}
+
+class Bonus {
+  int id;
+  String name;
+  List<RankElement> ranks;
+
+  Bonus({
+    required this.id,
+    required this.name,
+    required this.ranks,
+  });
+
+  factory Bonus.fromRawJson(String str) => Bonus.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Bonus.fromJson(Map<String, dynamic> json) => Bonus(
+        id: json["id"],
+        name: json["name"],
+        ranks: List<RankElement>.from(
+            json["ranks"].map((x) => RankElement.fromJson(x))),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "ranks": List<dynamic>.from(ranks.map((x) => x.toJson())),
+      };
+}
+
+class RankElement {
+  int pieces;
+  String description;
+
+  RankElement({
+    required this.pieces,
+    required this.description,
+  });
+
+  factory RankElement.fromRawJson(String str) =>
+      RankElement.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory RankElement.fromJson(Map<String, dynamic> json) => RankElement(
+        pieces: json["pieces"],
+        description: json["description"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "pieces": pieces,
+        "description": description,
+      };
+}
+
+class Piece {
+  int id;
+  int rarity;
+  Defense defense;
+  Resistances resistances;
+  String name;
+
+  Piece({
+    required this.id,
+    required this.rarity,
+    required this.defense,
+    required this.resistances,
+    required this.name,
+  });
+
+  factory Piece.fromRawJson(String str) => Piece.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Piece.fromJson(Map<String, dynamic> json) => Piece(
+        id: json["id"],
+        rarity: json["rarity"],
+        defense: Defense.fromJson(json["defense"]),
+        resistances: Resistances.fromJson(json["resistances"]),
+        name: json["name"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "rarity": rarity,
+        "defense": defense.toJson(),
+        "resistances": resistances.toJson(),
+        "name": name,
+      };
+}
+
+class ArmorsAssets {
+  //Puede dar error el provider y la api externa****************************************************************
+  String imageMale;
+  String imageFemale;
+
+  ArmorsAssets({
+    required this.imageMale,
+    required this.imageFemale,
+  });
+
+  factory ArmorsAssets.fromRawJson(String str) =>
+      ArmorsAssets.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory ArmorsAssets.fromJson(Map<String, dynamic> json) => ArmorsAssets(
+        imageMale: json["imageMale"],
+        imageFemale: json["imageFemale"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "imageMale": imageMale,
+        "imageFemale": imageFemale,
+      };
+}
+
+class Defense {
+  int base;
+  int max;
+  int augmented;
+
+  Defense({
+    required this.base,
+    required this.max,
+    required this.augmented,
+  });
+
+  factory Defense.fromRawJson(String str) => Defense.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Defense.fromJson(Map<String, dynamic> json) => Defense(
+        base: json["base"],
+        max: json["max"],
+        augmented: json["augmented"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "base": base,
+        "max": max,
+        "augmented": augmented,
+      };
+}
+
+class Resistances {
+  int fire;
+  int water;
+  int ice;
+  int thunder;
+  int dragon;
+
+  Resistances({
+    required this.fire,
+    required this.water,
+    required this.ice,
+    required this.thunder,
+    required this.dragon,
+  });
+
+  factory Resistances.fromRawJson(String str) =>
+      Resistances.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Resistances.fromJson(Map<String, dynamic> json) => Resistances(
+        fire: json["fire"],
+        water: json["water"],
+        ice: json["ice"],
+        thunder: json["thunder"],
+        dragon: json["dragon"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "fire": fire,
+        "water": water,
+        "ice": ice,
+        "thunder": thunder,
+        "dragon": dragon,
+      };
+}
 
-import 'package:http/http.dart' as http;
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\models\hunter\items_data.dart
+NOMBRE_DEL_ARCHIVO: items_data.dart
+CONTENIDO:
+import 'dart:convert';
+
+class Items {
+  int id;
+  int rarity;
+  int carryLimit;
+  int value;
+  String name;
+  String description;
+
+  Items({
+    required this.id,
+    required this.rarity,
+    required this.carryLimit,
+    required this.value,
+    required this.name,
+    required this.description,
+  });
+
+  factory Items.fromRawJson(String str) => Items.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Items.fromJson(Map<String, dynamic> json) => Items(
+        id: json["id"],
+        rarity: json["rarity"],
+        carryLimit: json["carryLimit"],
+        value: json["value"],
+        name: json["name"],
+        description: json["description"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "rarity": rarity,
+        "carryLimit": carryLimit,
+        "value": value,
+        "name": name,
+        "description": description,
+      };
+}
 
-import 'package:apimh/models/models.dart';
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\models\hunter\weapons_data.dart
+NOMBRE_DEL_ARCHIVO: weapons_data.dart
+CONTENIDO:
+import 'dart:convert';
+
+class Weapons {
+  int id;
+  int rarity;
+  Attack attack;
+  Attributes attributes;
+  String name;
+  Crafting crafting;
+  Assets assets;
+
+  Weapons({
+    required this.id,
+    required this.rarity,
+    required this.attack,
+    required this.attributes,
+    required this.name,
+    required this.crafting,
+    required this.assets,
+  });
+
+  factory Weapons.fromRawJson(String str) => Weapons.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Weapons.fromJson(Map<String, dynamic> json) => Weapons(
+        id: json["id"],
+        rarity: json["rarity"],
+        attack: Attack.fromJson(json["attack"]),
+        attributes: Attributes.fromJson(json["attributes"]),
+        name: json["name"],
+        crafting: Crafting.fromJson(json["crafting"]),
+        assets: Assets.fromJson(json["assets"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "rarity": rarity,
+        "attack": attack.toJson(),
+        "attributes": attributes.toJson(),
+        "name": name,
+        "crafting": crafting.toJson(),
+        "assets": assets.toJson(),
+      };
+}
+
+class Attack {
+  int display;
+  int raw;
+
+  Attack({
+    required this.display,
+    required this.raw,
+  });
+
+  factory Attack.fromRawJson(String str) => Attack.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Attack.fromJson(Map<String, dynamic> json) => Attack(
+        display: json["display"],
+        raw: json["raw"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "display": display,
+        "raw": raw,
+      };
+}
+
+class Attributes {
+  dynamic affinity;
+  int defense;
+
+  Attributes({
+    required this.affinity,
+    required this.defense,
+  });
+
+  factory Attributes.fromRawJson(String str) =>
+      Attributes.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Attributes.fromJson(Map<String, dynamic> json) => Attributes(
+        affinity: json["affinity"],
+        defense: json["defense"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "affinity": affinity,
+        "defense": defense,
+      };
+}
+
+class Crafting {
+  bool craftable;
+  int previous;
+
+  Crafting({
+    required this.craftable,
+    required this.previous,
+  });
+
+  factory Crafting.fromRawJson(String str) =>
+      Crafting.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Crafting.fromJson(Map<String, dynamic> json) => Crafting(
+        craftable: json["craftable"],
+        previous: json["previous"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "craftable": craftable,
+        "previous": previous,
+      };
+}
+
+class Assets {
+  String icon;
+  String image;
+
+  Assets({
+    required this.icon,
+    required this.image,
+  });
+
+  factory Assets.fromRawJson(String str) => Assets.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Assets.fromJson(Map<String, dynamic> json) => Assets(
+        icon: json["icon"],
+        image: json["image"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "icon": icon,
+        "image": image,
+      };
+}
 
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\models\monsters\monsters_data.dart
+NOMBRE_DEL_ARCHIVO: monsters_data.dart
+CONTENIDO:
+import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
+class Monster {
+  int id;
+  String species;
+  String name;
+  String description;
+
+  Monster({
+    required this.id,
+    required this.species,
+    required this.name,
+    required this.description,
+  });
+
+  Future<String?> getImagePath(String imageName) async {
+    // Obtener el directorio de documentos de la aplicaciÃ³n
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String appDocPath = appDocDir.path;
+
+    // Construir la ruta completa del archivo de imagen
+    String imagePath = '$appDocPath/imgs/monsters/$imageName.jpg';
+    //print(imagePath);
+
+    // Verificar si el archivo existe
+    if (await File(imagePath).exists()) {
+      return imagePath;
+    } else {
+      // Si el archivo no existe, puedes devolver null o una ruta predeterminada si quieres mostrar una imagen predeterminada.
+      return null;
+    }
+  }
+
+  Future<bool> doesImageExist() async {
+    String? imagePath = await getImagePath(name);
+    return imagePath != null && File(imagePath).existsSync();
+  }
+
+  factory Monster.fromRawJson(String str) => Monster.fromJson(json.decode(str));
+
+  factory Monster.fromJson(Map<String, dynamic> json) => Monster(
+        id: json["id"],
+        species: json["species"],
+        name: json["name"],
+        description: json["description"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "species": species,
+        "name": name,
+        "description": description,
+      };
+}
 
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\models\monsters\zones_data.dart
+NOMBRE_DEL_ARCHIVO: zones_data.dart
+CONTENIDO:
+import 'dart:convert';
+
+class Zones {
+  int id;
+  int zoneCount;
+  String name;
+  List<Camp> camps;
+
+  Zones({
+    required this.id,
+    required this.zoneCount,
+    required this.name,
+    required this.camps,
+  });
+
+  factory Zones.fromRawJson(String str) => Zones.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Zones.fromJson(Map<String, dynamic> json) => Zones(
+        id: json["id"],
+        zoneCount: json["zoneCount"],
+        name: json["name"],
+        camps: List<Camp>.from(json["camps"].map((x) => Camp.fromJson(x))),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "zoneCount": zoneCount,
+        "name": name,
+        "camps": List<dynamic>.from(camps.map((x) => x.toJson())),
+      };
+}
+
+class Camp {
+  int id;
+  int zone;
+  String name;
+
+  Camp({
+    required this.id,
+    required this.zone,
+    required this.name,
+  });
+
+  factory Camp.fromRawJson(String str) => Camp.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Camp.fromJson(Map<String, dynamic> json) => Camp(
+        id: json["id"],
+        zone: json["zone"],
+        name: json["name"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "zone": zone,
+        "name": name,
+      };
+}
 
-class MonstersProvider extends ChangeNotifier {
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\providers\data_provider.dart
+NOMBRE_DEL_ARCHIVO: data_provider.dart
+CONTENIDO:
+// ignore_for_file: avoid_print
+
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:apimh/models/models.dart';
+
+class DataProvider extends ChangeNotifier {
+  final String _baseUrl = 'mhw-db.com';
+
+  List<Monster> onDisplayMonsters = [];
+  List<Armors> onDisplayArmors = [];
+  List<Items> onDisplayItems = [];
+  List<Zones> onDisplayZones = [];
+  List<Weapons> onDisplayWeapons = [];
+
+  Future<void> getMonsterFilter(
+      {String endpoint = 'monsters', List<String>? names}) async {
+    var url = Uri.https(_baseUrl, endpoint);
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        final responseData =
+            Response.fromJson(jsonResponse) as Map<String, dynamic>;
+
+        if (endpoint == 'monsters') {
+          onDisplayMonsters = responseData.monsters;
+/*         } else if (endpoint == 'armor/sets') {
+          onDisplayArmors = responseData.armors;
+        } else if (endpoint == 'items') {
+          onDisplayItems = responseData.items;
+        } else if (endpoint == 'locations') {
+          onDisplayZones = responseData.zones;
+        } else if (endpoint == 'weapons') {
+          onDisplayWeapons = responseData.weapons; */
+        }
+
+        notifyListeners();
+      } else {
+        print('Error en la solicitud: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+}
 
-  final String _baseUrl = 'mhw-db.com';
-
-  List<Monster> onDisplayMonsters = [];
-
-
-
-  Future<void> getMonsterInfo({List<String>? names}) async {
-
-    String monsters = 'monsters';
-
-    var url = Uri.https(_baseUrl, monsters);
-
-
-
-    try {
-
-      final response = await http.get(url);
-
-
-
-      if (response.statusCode == 200) {
-
-        final List<dynamic> jsonResponse = json.decode(response.body);
-
-        final monsterInfo = Response.fromJson(jsonResponse);
-
-
-
-        if (names != null && names.isNotEmpty) {
-
-          onDisplayMonsters = monsterInfo.info
-
-              .where((monster) => names.contains(monster.name))
-
-              .toList();
-
-        } else {
-
-          onDisplayMonsters = monsterInfo.info;
-
-        }
-
-
-
-        // Imprimir la lista solo la primera vez que se obtienen los datos
-
-/*         if (!_isListPrinted) {
-
-          print('Lista de monstruos obtenida de la API:');
-
-          onDisplayMonsters.forEach((monster) {
-
-            print('ID: ${monster.id}, Nombre: ${monster.name}');
-
-          });
-
-          _isListPrinted = true;
-
-        } */
-
-
-
-        notifyListeners();
-
-      } else {
-
-        // ignore: avoid_print
-
-        print('Error en la solicitud: ${response.statusCode}');
-
-      }
-
-    } catch (error) {
-
-      // ignore: avoid_print
-
-      print('Error: $error');
-
-    }
-
-  }
-
-}
-
-
-==================================================
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\providers\providers.dart
 NOMBRE_DEL_ARCHIVO: providers.dart
 CONTENIDO:
-export 'package:apimh/providers/monsters_provider.dart';
+export 'package:apimh/providers/data_provider.dart';
 
-
-==================================================
-NOMBRE_DEL_ARCHIVO: details_screen.dart
-CONTENIDO:
-import 'package:chewie/chewie.dart';
-
-import 'package:flutter/material.dart';
-
-import 'package:apimh/models/models.dart';
-
-import 'package:video_player/video_player.dart';
-
-
-
-class DetailsScreen extends StatefulWidget {
-
-  const DetailsScreen({super.key});
-
-
-
-  @override
-
-  State<DetailsScreen> createState() => _DetailsScreenState();
-
-}
-
-
-
-class _DetailsScreenState extends State<DetailsScreen> {
-
-  bool isTextVisible = true;
-
-  void toggleTextVisibility() {
-
-    setState(() {
-
-      isTextVisible = !isTextVisible;
-
-    });
-
-  }
-
-
-
-  Widget _buildVideoPlayer(String videoFileName) {
-
-    VideoPlayerController videoPlayerController = VideoPlayerController.asset(
-
-        'assets/videos/monsters/$videoFileName.mp4');
-
-
-
-    ChewieController chewieController = ChewieController(
-
-      videoPlayerController: videoPlayerController,
-
-      autoPlay: true,
-
-      looping: true,
-
-      // Puedes personalizar mÃ¡s opciones aquÃ­ segÃºn tus necesidades
-
-    );
-
-
-
-    return Chewie(
-
-      controller: chewieController,
-
-    );
-
-  }
-
-
-
-  @override
-
-  Widget build(BuildContext context) {
-
-    final Monster monster =
-
-        ModalRoute.of(context)?.settings.arguments as Monster;
-
-
-
-    return Scaffold(
-
-      appBar: AppBar(backgroundColor: Colors.orange, title: Text(monster.name)),
-
-      body: CustomScrollView(
-
-        slivers: [
-
-          SliverList(
-
-            delegate: SliverChildListDelegate.fixed([
-
-              _MonsterName(monster: monster),
-
-              const SizedBox(height: 20),
-
-              _MonsterImage(name: monster.name),
-
-              const SizedBox(height: 20),
-
-              _buildVideoPlayer(
-
-                  monster.name), // Agrega el video despuÃ©s de la imagen
-
-            ]),
-
-          ),
-
-        ],
-
-      ),
-
-    );
-
-  }
-
-}
-
-
-
-// Resto del cÃ³digo de _MonsterName y _MonsterImage
-
-
-
-class _MonsterName extends StatelessWidget {
-
-  final Monster monster;
-
-
-
-  const _MonsterName({required this.monster});
-
-
-
-  @override
-
-  Widget build(BuildContext context) {
-
-    return Column(
-
-      children: [
-
-        Container(
-
-          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-
-          alignment: Alignment.topLeft,
-
-          child: Text(
-
-            monster.name,
-
-            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-
-            textAlign: TextAlign.left,
-
-          ),
-
-        ),
-
-        Container(
-
-          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-
-          alignment: Alignment.topLeft,
-
-          child: Text(
-
-            monster.description,
-
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-
-            textAlign: TextAlign.left,
-
-          ),
-
-        ),
-
-      ],
-
-    );
-
-  }
-
-}
-
-
-
-class _MonsterImage extends StatelessWidget {
-
-  final String name;
-
-
-
-  const _MonsterImage({required this.name});
-
-
-
-  @override
-
-  Widget build(BuildContext context) {
-
-    return Center(
-
-      child: Image.asset(
-
-        'assets/imgs/monsters/$name.jpg', // Ruta de la imagen del monstruo
-
-        fit: BoxFit
-
-            .cover, // Ajustar la imagen para que se vea completa sin importar el tamaÃ±o original
-
-        width:
-
-            250, // TamaÃ±o especÃ­fico para la imagen (ajÃºstalo segÃºn tus necesidades)
-
-        height:
-
-            250, // TamaÃ±o especÃ­fico para la imagen (ajÃºstalo segÃºn tus necesidades)
-
-        errorBuilder: (context, error, stackTrace) {
-
-          // En caso de error al cargar la imagen, cargar la imagen de respaldo
-
-          return Image.asset(
-
-            'assets/imgs/nodata.jpg', // Ruta de la imagen de respaldo
-
-            fit: BoxFit
-
-                .cover, // Ajustar la imagen de respaldo de la misma manera
-
-            width: 250, // TamaÃ±o especÃ­fico para la imagen de respaldo
-
-            height: 250, // TamaÃ±o especÃ­fico para la imagen de respaldo
-
-          );
-
-        },
-
-      ),
-
-    );
-
-  }
-
-}
-
-
-==================================================
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\screens\home_screen.dart
 NOMBRE_DEL_ARCHIVO: home_screen.dart
 CONTENIDO:
-import 'package:flutter/material.dart';
-
-import 'package:provider/provider.dart';
-
-import 'package:apimh/widgets/widgets.dart';
-
-import 'package:apimh/providers/providers.dart';
-
-import 'package:chewie/chewie.dart';
-
-import 'package:video_player/video_player.dart';
-
-
-
-class HomeScreen extends StatelessWidget {
-
-  const HomeScreen({super.key});
-
-
-
-  Widget _buildIntroVideo() {
-
-    VideoPlayerController videoPlayerController =
-
-        VideoPlayerController.asset('assets/videos/menus/trailer.mp4');
-
-
-
-    ChewieController chewieController = ChewieController(
-
-      videoPlayerController: videoPlayerController,
-
-      autoPlay: true,
-
-      looping: true,
-
-      // Puedes personalizar mÃ¡s opciones aquÃ­ segÃºn tus necesidades
-
-    );
-
-
-
-    return SizedBox(
-
-      width: 150, // Ancho del contenedor
-
-      height: 150, // Alto del contenedor
-
-      child: Chewie(
-
-        controller: chewieController,
-
-      ),
-
-    );
-
-  }
-
-
-
-  @override
-
-  Widget build(BuildContext context) {
-
-    final monstersProvider = Provider.of<MonstersProvider>(context);
-
-    List<String> nombresDeseados = [
-
-      "Anjanath",
-
-      "Azure Rathalos",
-
-      "Barioth",
-
-      "Barroth",
-
-      "Black Diablos",
-
-      "Deviljho",
-
-      "Diablos",
-
-      "Dodogama",
-
-      "Great Girros",
-
-      "Jyuratodus",
-
-      "Kirin",
-
-      "Kulu-Ya-Ku",
-
-      "Kushala Daora",
-
-      "Lavasioth",
-
-      "Legiana",
-
-      "Lunastra",
-
-      "Nergigante",
-
-      "Odogaron",
-
-      "Paolumu",
-
-      "Pink Rathian",
-
-      "Pukei-Pukei",
-
-      "Radobaan",
-
-      "Rathalos",
-
-      "Rathian",
-
-      "Teostra",
-
-      "Tobi-Kadachi",
-
-      "Tzitzi-Ya-Ku",
-
-      "Uragaan",
-
-      "Vaal Hazak",
-
-      "Xeno'jiiva",
-
-      "Zorah Magdaros",
-
-      "Zinogre"
-
-    ];
-
-
-
-    // Llamar al mÃ©todo getMonsterInfo con la lista de nombres deseados
-
-    Future<void> loadMonsters() async {
-
-      await monstersProvider.getMonsterInfo(names: nombresDeseados);
-
-    }
-
-
-
-    // Llamar al mÃ©todo de carga de monstruos cuando se construye el widget
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-
-      loadMonsters();
-
-    });
-
-
-
-    return Scaffold(
-
-      appBar: AppBar(
-
-        elevation: 0,
-
-        actions: [
-
-          IconButton(
-
-            onPressed: () {},
-
-            icon: const Icon(Icons.search_outlined),
-
-          )
-
-        ],
-
-        title: const Center(
-
-          child: Text('MONSTERS'),
-
-        ),
-
-      ),
-
-      body: Consumer<MonstersProvider>(
-
-        builder: (_, provider, __) {
-
-          if (provider.onDisplayMonsters.isEmpty) {
-
-            return const Center(child: CircularProgressIndicator());
-
-          } else {
-
-            return Column(
-
-              children: [
-
-                _buildIntroVideo(), // Agrega el video antes del swiper
-
-                CardSwiper(
-
-                  monsters: provider.onDisplayMonsters,
-
-                ),
-
-              ],
-
-            );
-
-          }
-
-        },
-
-      ),
-
-    );
-
-  }
-
-}
-
-
-==================================================
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:apimh/widgets/widgets.dart';
+import 'package:apimh/providers/providers.dart';
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final monstersProvider = Provider.of<DataProvider>(context);
+    List<String> nombresDeseados = [
+      "Anjanath",
+      "Azure Rathalos",
+      "Barioth",
+      "Barroth",
+      "Black Diablos",
+      "Deviljho",
+      "Diablos",
+      "Dodogama",
+      "Great Girros",
+      "Jyuratodus",
+      "Kirin",
+      "Kulu-Ya-Ku",
+      "Kushala Daora",
+      "Lavasioth",
+      "Legiana",
+      "Lunastra",
+      "Nergigante",
+      "Odogaron",
+      "Paolumu",
+      "Pink Rathian",
+      "Pukei-Pukei",
+      "Radobaan",
+      "Rathalos",
+      "Rathian",
+      "Teostra",
+      "Tobi-Kadachi",
+      "Tzitzi-Ya-Ku",
+      "Uragaan",
+      "Vaal Hazak",
+      "Xeno'jiiva",
+      "Zorah Magdaros",
+      "Zinogre"
+    ];
+
+    // Llamar al mÃ©todo getMonsterInfo con la lista de nombres deseados
+    Future<void> loadMonsters() async {
+      await monstersProvider.getMonsterFilter(names: nombresDeseados);
+    }
+
+    // Llamar al mÃ©todo de carga de monstruos cuando se construye el widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadMonsters();
+    });
+
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.search_outlined),
+          )
+        ],
+        title: const Center(
+          child: Text('MONSTERS'),
+        ),
+      ),
+      body: Consumer<DataProvider>(
+        builder: (_, provider, __) {
+          if (provider.onDisplayMonsters.isEmpty) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            ); // Muestra un indicador de carga mientras se obtienen los datos.
+          } else {
+            return Column(
+              children: [
+                MonsterSwiper(monsters: provider.onDisplayMonsters),
+                WeaponsSwiper(weapons: provider.onDisplayWeapons),
+                ArmorsSwiper(armors: provider.onDisplayArmors),
+                ItemsSwiper(items: provider.onDisplayItems),
+                ZonesSwiper(zones: provider.onDisplayZones),
+              ],
+            );
+          }
+        },
+      ),
+    );
+  }
+}
+
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\screens\screens.dart
 NOMBRE_DEL_ARCHIVO: screens.dart
 CONTENIDO:
-export 'package:apimh/screens/details_screen.dart';
+export 'package:apimh/screens/hunter/armors_details_screen.dart';
+export 'package:apimh/screens/hunter/items_details_screen.dart';
+export 'package:apimh/screens/monsters/monsters_details_screen.dart';
+export 'package:apimh/screens/hunter/weapons_details_screen.dart';
+export 'package:apimh/screens/monsters/zones_details_screen.dart';
+export 'package:apimh/screens/home_screen.dart';
 
-export 'package:apimh/screens/home_screen.dart';
-
-
-==================================================
-NOMBRE_DEL_ARCHIVO: card_swiper.dart
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\screens\hunter\armors_details_screen.dart
+NOMBRE_DEL_ARCHIVO: armors_details_screen.dart
 CONTENIDO:
-import 'package:card_swiper/card_swiper.dart';
-
-import 'package:flutter/material.dart';
-
-import 'package:apimh/models/models.dart';
-
-
-
-class CardSwiper extends StatelessWidget {
-
-  final List<Monster> monsters;
-
-  const CardSwiper({super.key, required this.monsters});
-
-
-
-  @override
-
-  Widget build(BuildContext context) {
-
-    final size = MediaQuery.of(context).size;
-
-    return SingleChildScrollView(
-
-      child: SizedBox(
-
-        width: double.infinity,
-
-        height: size.height * 0.8,
-
-        child: Swiper(
-
-          itemCount: monsters.length,
-
-          layout: SwiperLayout.STACK,
-
-          itemWidth: size.width * 0.6,
-
-          itemHeight: size.height * 0.6,
-
-          itemBuilder: (_, int index) {
-
-            final monster = monsters[index];
-
-            return GestureDetector(
-
-              onTap: () {
-
-                //print("Pushing to details screen");
-
-                Navigator.pushNamed(context, '/details', arguments: monster);
-
-              },
-
-              child: ClipRRect(
-
-                borderRadius: BorderRadius.circular(20),
-
-                child: Column(
-
-                  children: [
-
-                    Container(
-
-                      padding: const EdgeInsets.all(10),
-
-                      color: Colors.orange,
-
-                      child: Text(
-
-                        monster.name,
-
-                        style: const TextStyle(
-
-                          color: Colors.white,
-
-                          fontSize: 24, // TamaÃ±o grande para el texto
-
-                          fontWeight: FontWeight.bold,
-
-                        ),
-
-                      ),
-
-                    ),
-
-                    Image.asset(
-
-                      'assets/imgs/monsters/${monster.name}.jpg',
-
-                      fit: BoxFit.cover,
-
-                      width: 250,
-
-                      height: 250,
-
-                      errorBuilder: (context, error, stackTrace) {
-
-                        return Image.asset(
-
-                          'assets/imgs/nodata.jpg',
-
-                          fit: BoxFit.cover,
-
-                          width: 250,
-
-                          height: 250,
-
-                        );
-
-                      },
-
-                    ),
-
-                  ],
-
-                ),
-
-              ),
-
-            );
-
-          },
-
-        ),
-
-      ),
-
-    );
-
-  }
-
-}
-
-
-==================================================
+import 'package:flutter/material.dart';
+
+class DetailsArmorsScreen extends StatelessWidget {
+  const DetailsArmorsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\screens\hunter\items_details_screen.dart
+NOMBRE_DEL_ARCHIVO: items_details_screen.dart
+CONTENIDO:
+import 'package:flutter/material.dart';
+
+class DetailsWeaponsScreen extends StatelessWidget {
+  const DetailsWeaponsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\screens\hunter\weapons_details_screen.dart
+NOMBRE_DEL_ARCHIVO: weapons_details_screen.dart
+CONTENIDO:
+import 'package:flutter/material.dart';
+
+class DetailsItemsScreen extends StatelessWidget {
+  const DetailsItemsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\screens\monsters\monsters_details_screen.dart
+NOMBRE_DEL_ARCHIVO: monsters_details_screen.dart
+CONTENIDO:
+import 'package:flutter/material.dart';
+import 'package:apimh/models/models.dart';
+
+class DetailsMonstersScreen extends StatefulWidget {
+  const DetailsMonstersScreen({super.key});
+
+  @override
+  State<DetailsMonstersScreen> createState() => _DetailsMonstersScreenState();
+}
+
+class _DetailsMonstersScreenState extends State<DetailsMonstersScreen> {
+  bool isTextVisible = true;
+  void toggleTextVisibility() {
+    setState(() {
+      isTextVisible = !isTextVisible;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Monster monster =
+        ModalRoute.of(context)?.settings.arguments as Monster;
+
+    return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.orange, title: Text(monster.name)),
+      body: CustomScrollView(
+        slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate.fixed([
+              _MonsterName(monster: monster),
+              const SizedBox(height: 20),
+              _MonsterImage(name: monster.name),
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MonsterName extends StatelessWidget {
+  final Monster monster;
+
+  const _MonsterName({required this.monster});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          alignment: Alignment.topLeft,
+          child: Text(
+            monster.name,
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.left,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          alignment: Alignment.topLeft,
+          child: Text(
+            monster.description,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            textAlign: TextAlign.left,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MonsterImage extends StatelessWidget {
+  final String name;
+
+  const _MonsterImage({required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Image.asset(
+        'assets/imgs/monsters/$name.jpg', // Ruta de la imagen del monstruo
+        fit: BoxFit
+            .cover, // Ajustar la imagen para que se vea completa sin importar el tamaÃ±o original
+        width:
+            250, // TamaÃ±o especÃ­fico para la imagen (ajÃºstalo segÃºn tus necesidades)
+        height:
+            250, // TamaÃ±o especÃ­fico para la imagen (ajÃºstalo segÃºn tus necesidades)
+        errorBuilder: (context, error, stackTrace) {
+          // En caso de error al cargar la imagen, cargar la imagen de respaldo
+          return Image.asset(
+            'assets/imgs/nodata.jpg', // Ruta de la imagen de respaldo
+            fit: BoxFit
+                .cover, // Ajustar la imagen de respaldo de la misma manera
+            width: 250, // TamaÃ±o especÃ­fico para la imagen de respaldo
+            height: 250, // TamaÃ±o especÃ­fico para la imagen de respaldo
+          );
+        },
+      ),
+    );
+  }
+}
+
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\screens\monsters\zones_details_screen.dart
+NOMBRE_DEL_ARCHIVO: zones_details_screen.dart
+CONTENIDO:
+import 'package:flutter/material.dart';
+
+class DetailsZonesScreen extends StatelessWidget {
+  const DetailsZonesScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\widgets\widgets.dart
 NOMBRE_DEL_ARCHIVO: widgets.dart
 CONTENIDO:
-export 'package:apimh/widgets/card_swiper.dart';
+//----------------------------------------------------------------
+//SWIPERS:
+export 'package:apimh/widgets/swipers/main_swiper.dart';
+export 'package:apimh/widgets/swipers/monsters/monsters_swiper.dart';
+export 'package:apimh/widgets/swipers/monsters/zones__swiper.dart';
+export 'package:apimh/widgets/swipers/hunter/armors_swiper.dart';
+export 'package:apimh/widgets/swipers/hunter/items_swiper.dart';
+export 'package:apimh/widgets/swipers/hunter/weapons_swiper.dart';
+
+//----------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\widgets\swipers\main_swiper.dart
+NOMBRE_DEL_ARCHIVO: main_swiper.dart
+CONTENIDO:
+import 'package:flutter/material.dart';
+import 'package:apimh/models/models.dart';
+import 'package:card_swiper/card_swiper.dart';
+import 'package:apimh/widgets/widgets.dart';
+
+class MainSwiper extends StatelessWidget {
+  final List<Monster> monsters;
+  final List<Armors> armors;
+  final List<Weapons> weapons;
+  final List<Items> items;
+  final List<Zones> zones;
+
+  const MainSwiper({
+    Key? key,
+    required this.monsters,
+    required this.armors,
+    required this.weapons,
+    required this.items,
+    required this.zones,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Swiper(
+        itemCount: 5,
+        itemBuilder: (BuildContext context, int index) {
+          switch (index) {
+            case 0:
+              return MonsterSwiper(monsters: monsters);
+            case 1:
+              return WeaponsSwiper(weapons: weapons);
+            case 2:
+              return ArmorsSwiper(armors: armors);
+            case 3:
+              return ItemsSwiper(items: items);
+            case 4:
+              return ZonesSwiper(zones: zones);
+            default:
+              return Container();
+          }
+        },
+      ),
+    );
+  }
+}
 
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\widgets\swipers\hunter\armors_swiper.dart
+NOMBRE_DEL_ARCHIVO: armors_swiper.dart
+CONTENIDO:
+import 'package:card_swiper/card_swiper.dart';
+import 'package:flutter/material.dart';
+import 'package:apimh/models/models.dart';
+
+class ArmorsSwiper extends StatelessWidget {
+  final List<Armors> armors;
+  const ArmorsSwiper({Key? key, required this.armors}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return SingleChildScrollView(
+      child: SizedBox(
+        width: double.infinity,
+        height: size.height * 0.6,
+        child: Swiper(
+          itemCount: armors.length,
+          layout: SwiperLayout.STACK,
+          itemWidth: size.width * 0.6,
+          itemHeight: size.height * 0.6,
+          itemBuilder: (_, int index) {
+            final armor = armors[index];
+            return GestureDetector(
+              onTap: () {
+                // Navegar a los detalles de la armadura
+                Navigator.pushNamed(context, '/armor_details',
+                    arguments: armor);
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      color: Colors.green, // Color para las armaduras
+                      child: Text(
+                        armor.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    // Puedes agregar mÃ¡s informaciÃ³n de la armadura aquÃ­ si es necesario
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
 
-==================================================
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\widgets\swipers\hunter\items_swiper.dart
+NOMBRE_DEL_ARCHIVO: items_swiper.dart
+CONTENIDO:
+import 'package:card_swiper/card_swiper.dart';
+import 'package:flutter/material.dart';
+import 'package:apimh/models/models.dart';
+
+class ItemsSwiper extends StatelessWidget {
+  final List<Items> items;
+  const ItemsSwiper({Key? key, required this.items}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return SingleChildScrollView(
+      child: SizedBox(
+        width: double.infinity,
+        height: size.height * 0.6,
+        child: Swiper(
+          itemCount: items.length,
+          layout: SwiperLayout.STACK,
+          itemWidth: size.width * 0.6,
+          itemHeight: size.height * 0.6,
+          itemBuilder: (_, int index) {
+            final item = items[index];
+            return GestureDetector(
+              onTap: () {
+                // Navegar a los detalles del item
+                Navigator.pushNamed(context, '/item_details', arguments: item);
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      color: Colors.yellow, // Color para los items
+                      child: Text(
+                        item.name,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    // Puedes agregar mÃ¡s informaciÃ³n del item aquÃ­ si es necesario
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\widgets\swipers\hunter\weapons_swiper.dart
+NOMBRE_DEL_ARCHIVO: weapons_swiper.dart
+CONTENIDO:
+import 'package:card_swiper/card_swiper.dart';
+import 'package:flutter/material.dart';
+import 'package:apimh/models/models.dart';
+
+class WeaponsSwiper extends StatelessWidget {
+  final List<Weapons> weapons;
+  const WeaponsSwiper({Key? key, required this.weapons}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return SingleChildScrollView(
+      child: SizedBox(
+        width: double.infinity,
+        height: size.height * 0.6,
+        child: Swiper(
+          itemCount: weapons.length,
+          layout: SwiperLayout.STACK,
+          itemWidth: size.width * 0.6,
+          itemHeight: size.height * 0.6,
+          itemBuilder: (_, int index) {
+            final weapon = weapons[index];
+            return GestureDetector(
+              onTap: () {
+                // Navegar a los detalles del arma
+                Navigator.pushNamed(context, '/weapon_details',
+                    arguments: weapon);
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      color: Colors.red, // Color para las armas
+                      child: Text(
+                        weapon.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    // Puedes agregar mÃ¡s informaciÃ³n del arma aquÃ­ si es necesario
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\widgets\swipers\monsters\monsters_swiper.dart
+NOMBRE_DEL_ARCHIVO: monsters_swiper.dart
+CONTENIDO:
+import 'package:card_swiper/card_swiper.dart';
+import 'package:flutter/material.dart';
+import 'package:apimh/models/models.dart';
+
+class MonsterSwiper extends StatelessWidget {
+  final List<Monster> monsters;
+  const MonsterSwiper({super.key, required this.monsters});
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return SingleChildScrollView(
+      child: SizedBox(
+        width: double.infinity,
+        height: size.height * 0.6,
+        child: Swiper(
+          itemCount: monsters.length,
+          layout: SwiperLayout.STACK,
+          itemWidth: size.width * 0.6,
+          itemHeight: size.height * 0.6,
+          itemBuilder: (_, int index) {
+            final monster = monsters[index];
+            return GestureDetector(
+              onTap: () {
+                //print("Pushing to details screen");
+                Navigator.pushNamed(context, '/details', arguments: monster);
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      color: Colors.orange,
+                      child: Text(
+                        monster.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24, // TamaÃ±o grande para el texto
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Image.asset(
+                      'assets/imgs/monsters/${monster.name}.jpg',
+                      fit: BoxFit.cover,
+                      width: 250,
+                      height: 250,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/imgs/nodata.jpg',
+                          fit: BoxFit.cover,
+                          width: 250,
+                          height: 250,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+====================================================================================================
+RUTA_DEL_ARCHIVO: C:/Users/zerom/Downloads/VS Code/apiMH/apimh/lib\widgets\swipers\monsters\zones__swiper.dart
+NOMBRE_DEL_ARCHIVO: zones__swiper.dart
+CONTENIDO:
+import 'package:card_swiper/card_swiper.dart';
+import 'package:flutter/material.dart';
+import 'package:apimh/models/models.dart';
+
+class ZonesSwiper extends StatelessWidget {
+  final List<Zones> zones;
+  const ZonesSwiper({Key? key, required this.zones}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return SingleChildScrollView(
+      child: SizedBox(
+        width: double.infinity,
+        height: size.height * 0.6,
+        child: Swiper(
+          itemCount: zones.length,
+          layout: SwiperLayout.STACK,
+          itemWidth: size.width * 0.6,
+          itemHeight: size.height * 0.6,
+          itemBuilder: (_, int index) {
+            final zone = zones[index];
+            return GestureDetector(
+              onTap: () {
+                // Navegar a los detalles de la zona
+                Navigator.pushNamed(context, '/zone_details', arguments: zone);
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      color: Colors.blue, // Color para las zonas
+                      child: Text(
+                        zone.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Image.asset(
+                      'assets/imgs/zones/${zone.name}.jpg', // Ruta de la imagen de la zona
+                      fit: BoxFit.cover,
+                      width: 250,
+                      height: 250,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/imgs/nodata.jpg', // Placeholder en caso de error
+                          fit: BoxFit.cover,
+                          width: 250,
+                          height: 250,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+====================================================================================================
